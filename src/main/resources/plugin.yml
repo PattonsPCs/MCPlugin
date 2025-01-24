@@ -12,7 +12,10 @@ commands:
     description: Bid farewell to a player
     usage: /<command> <player>
     permission: exampleplugin.farewell
-
+  showstats:
+    description: Shows the stats of the player
+    usage: /<command>
+    permission: exampleplugin.showstats
 
 
 
@@ -23,3 +26,6 @@ permissions:
     exampleplugin.farewell:
         description: Allows the player to bid farewell to others
         default: true
+    exampleplugin.showstats:
+      description: Allows the player to see their stats
+      default: true

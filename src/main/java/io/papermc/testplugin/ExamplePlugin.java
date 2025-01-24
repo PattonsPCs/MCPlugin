@@ -10,6 +10,7 @@ public class ExamplePlugin extends JavaPlugin{
         instance = this;
         this.getCommand("greet").setExecutor(new GreetCommand());
         this.getCommand("farewell").setExecutor(new FarewellCommand());
+        this.getCommand("showstats").setExecutor(new PlayerStats());
         this.getServer().getPluginManager().registerEvents(new EventListener() , this);
         this.getServer().getPluginManager().registerEvents(new Leaderboard(), this);
         getLogger().info("ExamplePlugin has been enabled.");
