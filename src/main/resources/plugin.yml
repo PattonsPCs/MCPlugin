@@ -16,6 +16,10 @@ commands:
     description: Shows the stats of the player
     usage: /<command>
     permission: exampleplugin.showstats
+  showleaderboard:
+    description: Shows the leaderboard of players
+    usage: /<command>
+    permission: exampleplugin.showleaderboard
 
 
 
@@ -28,4 +32,7 @@ permissions:
         default: true
     exampleplugin.showstats:
       description: Allows the player to see their stats
+      default: true
+    exampleplugin.showleaderboard:
+      description: ALlows the player to see the leaderboard
       default: true

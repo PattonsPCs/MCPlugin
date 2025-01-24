@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import net.kyori.adventure.text.Component;
 
 
 import java.util.Objects;
@@ -32,7 +34,8 @@ public class EventListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player newPlayer = event.getPlayer();
-        Bukkit.getServer().broadcastMessage("Hi there " + newPlayer.getName() + "! How are you?");
+        Component message = Component.text("Hi there " + newPlayer.getName() + "! How are you?");
+        Bukkit.getServer().sendMessage(message);
     }
 
     @EventHandler
@@ -40,7 +43,8 @@ public class EventListener implements Listener {
         Player player = changedWorldEvent.getPlayer();
         String fromWorld = changedWorldEvent.getFrom().getName();
         String toWorld = player.getWorld().getName();
-        Bukkit.getServer().broadcastMessage(player.getName() + " has traveled from " + fromWorld + " to " + toWorld + "!");
+        Component message = Component.text(player.getName() + " has traveled from " + fromWorld + " to " + toWorld + "!");
+        Bukkit.getServer().sendMessage(message);
 
     }
 
@@ -68,11 +72,12 @@ public class EventListener implements Listener {
         LivingEntity mob = dmgEvent.getEntity();
         if(dmgEvent.getEntity().getKiller() instanceof Player killer){
             if(dmgEvent.getEntity() instanceof Monster victim){
-                Bukkit.getServer().broadcastMessage(killer.getName() + " has killed " + victim.getName() + "!");
+                Component message = Component.text(killer.getName() + " has killed " + victim.getName() + "!");
+                Bukkit.getServer().sendMessage(message);
             }
         }
         if(mob.hasMetadata("mobLevel")){
-            int level = mob.getMetadata("mobLevel").get(0).asInt();
+            int level = getMobLevel(mob);
             int baseExp = 50;
             int expReward = baseExp + level * 10;
 
@@ -82,9 +87,9 @@ public class EventListener implements Listener {
 
     @EventHandler
     public void onMobSpawn(CreatureSpawnEvent event){
-        if(event.getEntity() instanceof Monster monster){
+        if(event.getEntity() instanceof Monster){
             // Starting stuff
-            LivingEntity mob = (LivingEntity) event.getEntity();
+            LivingEntity mob = event.getEntity();
             Location location = mob.getLocation();
             String biome = location.getBlock().getBiome().toString();
 
@@ -98,7 +103,8 @@ public class EventListener implements Listener {
             NamespacedKey key = new NamespacedKey(new ExamplePlugin(), "mobLevel");
             data.set(key, PersistentDataType.INTEGER, mobLevel);
             // Set up the mobs
-            mob.setCustomName("Lvl " + mobLevel + "  " + mob.getType().name());
+            Component message = Component.text("Lvl " + mobLevel + "  " + mob.getType().name());
+            mob.customName(message);
             mob.setCustomNameVisible(true);
 
             // Scaling stats
@@ -115,9 +121,12 @@ public class EventListener implements Listener {
     }
 
     private void statScaling(LivingEntity mob, int level){
-        double health = mob.getHealth() + level * 2;
-        mob.setHealth(Math.min(health, mob.getMaxHealth()));
-
+        AttributeInstance maxHealthAttribute = mob.getAttribute(Attribute.MAX_HEALTH);
+        if(maxHealthAttribute != null){
+            double maxHealth = maxHealthAttribute.getBaseValue();
+            double newHealth = Math.min(mob.getHealth() + level * 2, maxHealth);
+            mob.setHealth(newHealth);
+        }
         Objects.requireNonNull(mob.getAttribute(Attribute.ATTACK_DAMAGE))
                 .setBaseValue(level * 1.5);
     }
@@ -125,6 +134,6 @@ public class EventListener implements Listener {
     private int getMobLevel(LivingEntity mob){
         PersistentDataContainer data = mob.getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey(new ExamplePlugin(), "mobLevel");
-        return data.has(key,PersistentDataType.INTEGER) ? data.get(key, PersistentDataType.INTEGER) : 1;
+        return Objects.requireNonNullElse(data.get(key, PersistentDataType.INTEGER), 1);
     }
 }

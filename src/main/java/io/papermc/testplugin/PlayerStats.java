@@ -1,5 +1,6 @@
 package io.papermc.testplugin;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
+
 
 public class PlayerStats implements CommandExecutor, Listener {
     // This is going to be a command
@@ -20,9 +22,10 @@ public class PlayerStats implements CommandExecutor, Listener {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] @NotNull args){
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args){
         if(sender instanceof Player player){
-            Bukkit.getServer().broadcastMessage(getStats(player));
+            Component message = Component.text(getStats(player));
+            Bukkit.getServer().sendMessage(message);
             return true;
         }
         sender.sendMessage("This command can only be run by a player.");

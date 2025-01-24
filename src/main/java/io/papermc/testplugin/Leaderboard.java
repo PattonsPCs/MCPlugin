@@ -1,17 +1,17 @@
 package io.papermc.testplugin;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.scoreboard.*;
+import org.bukkit.event.EventHandler;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.event.EventHandler;
-
 
 
 public class Leaderboard implements Listener {
@@ -20,7 +20,7 @@ public class Leaderboard implements Listener {
         Scoreboard board = manager.getNewScoreboard();
 
         // Create an objective
-        Objective objective = board.registerNewObjective("kills", "dummy", ChatColor.RED + "Kill Leaderboard");
+        Objective objective = board.registerNewObjective("Kills:", Criteria.DUMMY,  Component.text("Kill Leaderboard", NamedTextColor.RED));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         // Display
@@ -29,11 +29,13 @@ public class Leaderboard implements Listener {
 
     @EventHandler
     private void updateScores(EntityDeathEvent event){
-        if(event.getEntity().getKiller() instanceof Player killer && event.getEntity() instanceof Player victim ){
+        if(event.getEntity().getKiller() instanceof Player killer && event.getEntity() instanceof Player){
             Scoreboard currentBoard = killer.getScoreboard();
-            Objective currentObjective = currentBoard.getObjective("kills");
-            Score currentScore = currentObjective.getScore(ChatColor.RED + event.getEntity().getKiller().getName());
-            currentScore.setScore((currentScore.getScore() + 1));
+            Objective currentObjective = currentBoard.getObjective("Kills:");
+            if(currentObjective != null){
+                Score currentScore = currentObjective.getScore(killer.getName());
+                currentScore.setScore((currentScore.getScore() + 1));
+            }
         }
     }
 }
