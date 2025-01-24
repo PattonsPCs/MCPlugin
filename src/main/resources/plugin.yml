@@ -1,0 +1,25 @@
+name: ExamplePlugin
+main: io.papermc.testplugin.ExamplePlugin
+version: 1.0
+api-version: 1.16
+
+commands:
+  greet:
+    description: Greet a player
+    usage: /<command> <player>
+    permission: exampleplugin.greet
+  farewell:
+    description: Bid farewell to a player
+    usage: /<command> <player>
+    permission: exampleplugin.farewell
+
+
+
+
+permissions:
+    exampleplugin.greet:
+        description: Allows the player to greet others
+        default: true
+    exampleplugin.farewell:
+        description: Allows the player to bid farewell to others
+        default: true
